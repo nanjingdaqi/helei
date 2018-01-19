@@ -1,0 +1,84 @@
+#### 1. 异常，受检异常，非受检异常，异常输出栈的分析
+[博客](http://blog.csdn.net/hguisu/article/details/6155636)<br>
+[Java 常见异常种类,基本了解](https://www.cnblogs.com/cvst/p/5822373.html)
+* Java通过API中Throwable类的众多子类描述各种不同的异常，Error 和Exception（checked Exception& Runtime Exception）。<br>
+error程序无法处理的错误。<br>
+受检异常:checked Exception，java编译器会检查它，必须抛出或捕获。<br>
+Runtime Exception一般是程序编写的问题，如空指针或数组越界等，即使不抛出或捕获，程序也会编译通过。<br>
+非受检异常包括error和Runtime Exception。<br>
+* 抛出异常
+throws方法中，出现异常，但是没办法处理，抛出异常，交给该方法调用者处理或抛出。<br>
+throw函数体中，throw new XXXX
+* 捕获异常 try-catch(合适的异常处理器)-finally
+一旦某个catch捕获到匹配的异常类型，将进入异常处理代码。一经处理结束，就意味着整个try-catch语句结束。其他的catch子句不再有匹配和捕获异常类型的机会。<br>
+finally 块：无论是否捕获或处理异常，finally块里的语句都会被执行。当在try块或catch块中遇到return语句时，finally语句块将在方法返回之前被执行。在以下4种特殊情况下，finally块不会被执行：<br>
+1）在finally语句块中发生了异常。
+2）在前面的代码中用了System.exit()退出程序。
+3）程序所在的线程死亡。
+4）关闭CPU。
+
+* e.printStackTrace(); 打印异常栈里的信息（打印异常信息在程序中出错的位置及原因,而不是只说明错误类型），追踪输出至标准错误流<br>
+catch(Exception e){
+e.printStackTrace() ;
+}<br>
+java运行时系统会自动将catch括号中的Exception e 初始化，也就是实例化Exception类型的对象。e是此对象引用名称。然后e（引用）会自动调用Exception类中指定的方法，也就出现了e.printStackTrace();。<br>
+System.out.println(e);这个方法打印出异常，并且输出在哪里出现的异常；e.printStackTrace()也是打印出异常，但是它还将显示出一层层往外调用。
+
+
+
+
+#### 2.内存 堆 vs 栈 GC，与C的内存管理做比较，gc的原理
+[JVM&GC1](http://blog.csdn.net/winniepu/article/details/4829087)<br>
+[JVM&GC2](http://blog.csdn.net/qq_20641565/article/details/60332593)<br>
+[JVM&GC3](https://www.cnblogs.com/kniught-ice/p/4743812.html)<br>
+JVM中的堆栈<br>
+堆（全局）<br>
+栈（线程）:引用，局部变量，中间变量（方法退出后变量会销毁），存储比堆快<br>
+<br>
+在堆中有三个区域：<br>
+年轻代：新产生的对象（Eden&Survivor(from)&Survivor(to)）<br>
+老年代：生命周期长（多次没有被GC）的对象以及大对象。<br>
+持久代：永久保存区域，主要存放class和method。<br>
+
+GC算法：分代收集，频繁收集年轻代，较少收集老年代，基本不收集持久代。<br>
+<br>
+minor gc：为了避免在gc的时候产生内存碎片，jvm以牺牲空间的方式来做的，首先eden空间不足时会产生一次minor gc，垃圾回收器会在eden和一片使用的Survivor（假设是from）中进行清理，存活下来的对象会被复制到to中（假设to的大小足够装满），然后清空eden和from，保留下来的对象年龄加一。当年龄到达某一个设定值（-XX:MaxTenuringThreshold）时会进入老年代。还有一种情况是在Survivor区域相同年龄多有对象大于Survivor区域一半是所有该年龄及以上的都会被移动到老年代。<br>
+<br>
+full gc：minor gc时Survivor区域不足以容纳年轻代中存活下来的对象时，且老年代中剩余空间容纳不了新生代中存活下来的对象时会进行full gc。老年代中因为没有进行分区，所以回收算法使用的是标记－清理算法或者标记整理算法。扫描，可达就标记，当扫描完成后，就对未标记的对象进行回收，它不需要像复制算法一样，需要一个新的内存区，而且不会对对象进行copy，这种对对象存活的多的情况下很高效，但是这样会产生内存碎片。<br>
+GC效率比较高，尽量减少Full GC的次数（system.gc()）。<br>
+[C/C++ 堆栈，未仔细看](http://blog.csdn.net/summerdj/article/details/51375303)<br>
+
+
+#### 3.Java泛型，泛型的实现
+[可读](https://www.cnblogs.com/lucky_dai/p/5589317.html)<br>
+* 引入原因：原来使用object，接收对象，返回对象，object对象数组时，无论是哪一种类型，到内部都是一个object类型，所以在返回类型时，都需要一次强转换；对接受对象的类型也不能判别。
+==》给出泛型<>，替我们完成强制类型转换以及类型检查的工作。
+* 相关点：泛型是参数化类型，只能是类类型，不包含简单类型。<br>
+泛型类：类名<>,new对象时尖括号里直接换成具体的类型。<br>
+泛型方法：定义的格式是类型变量放在修饰符的后面，返回类型的前面。<br>
+对泛型变量的限制：extends<br>
+* 类型擦除（JVM）把所有类型参数替换为（一般是Object），之后再进行一次强制转换
+
+
+
+
+#### 4.结合源码分析常见容器类的适用场景和实现原理: ArrayList, LinkedList, HashMap, HashSet
+* ArrayList
+基于数组（位置和值有关系，前后位置的关系不显著），get和set比较方便
+数组扩容：以当前容量的两倍来重新构建一个数组，将旧元素Copy到新数组中，然后丢弃旧数组
+
+
+* LinkedList
+基于链表（双向链表，每一个节点保存前后节点的引用），增减数据比较方便
+
+
+* HashMap（AbstractMap）
+链表散列 底层是数组，数组的每一项都是链<br>
+构造函数（初始容量&加载因子）<br>
+HashMap<K,V>  table数组 Entry节点（K，V，next，hash）<br>
+put:计算key的hash值，hash值在table数组中的位置，若table数组在该位置处有元素，key是否相同，相同覆盖value，不相同保存在链头。[可以了解一下hash值的算法，怎样做到数据的分布均匀，以及扩容](http://www.cnblogs.com/chenssy/p/3521565.html)<br>
+get:key值 到key的hash值 到table数组中，key值到Entry节点（k,v整体）
+
+* [HashSet（AbstractSet）基于HashMap](http://blog.csdn.net/chenssy/article/details/21988605)<br>
+保存的是key值。<br>
+重写equals函数，week_1里提及，所有的equals本身都是去看引用是不是一个，重写才是判断内容是否一致。这样能保证同一个table数组位置的不同key值的存在，以及HashMap本身的key相同，覆盖value的操作保证了HashSet元素不会重复。
