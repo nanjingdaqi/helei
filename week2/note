@@ -82,3 +82,5 @@ get:key值 到key的hash值 到table数组中，key值到Entry节点（k,v整体
 * [HashSet（AbstractSet）基于HashMap](http://blog.csdn.net/chenssy/article/details/21988605)<br>
 保存的是key值。<br>
 重写equals函数，week_1里提及，所有的equals本身都是去看引用是不是一个，重写才是判断内容是否一致。这样能保证同一个table数组位置的不同key值的存在，以及HashMap本身的key相同，覆盖value的操作保证了HashSet元素不会重复。
+
+
