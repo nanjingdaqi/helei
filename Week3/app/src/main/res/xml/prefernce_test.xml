@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory android:title="无线和网络设置"></PreferenceCategory>
+
+    <CheckBoxPreference android:key="apply_fly"
+        android:title="飞行模式" android:summary="禁用所有无线连接" >
+    </CheckBoxPreference>
+
+
+
+    <CheckBoxPreference android:key="apply_wifi"
+        android:title="Wi-Fi" android:summary="打开Wi-Fi">
+    </CheckBoxPreference>
+    <Preference android:key="wifi_setting" android:title="Wi-Fi设置"
+        android:summary="设置和管理无线接入点" android:dependency="apply_wifi">
+
+        <intent android:action="com.example.hl.week3"
+            android:targetPackage="com.example.hl.week3" android:targetClass="com.example.hl.week3.WifiSettings" />
+    </Preference>
+    <ListPreference android:key="depart_value"
+        android:title="部门设置" android:dialogTitle="选择部门" android:entries="@array/department"
+        android:entryValues="@array/department_value">
+    </ListPreference>
+
+
+    <RingtonePreference android:key="ring_key"
+        android:title="铃声" android:ringtoneType="all" android:showDefault="true"
+        android:showSilent="true">
+    </RingtonePreference>
+
+    <EditTextPreference android:key="number_edit"
+        android:title="输入电话号码" android:defaultValue="123">
+    </EditTextPreference>
+</PreferenceScreen>
