@@ -83,4 +83,36 @@ get:key值 到key的hash值 到table数组中，key值到Entry节点（k,v整体
 保存的是key值。<br>
 重写equals函数，week_1里提及，所有的equals本身都是去看引用是不是一个，重写才是判断内容是否一致。这样能保证同一个table数组位置的不同key值的存在，以及HashMap本身的key相同，覆盖value的操作保证了HashSet元素不会重复。
 
+补充：
+服务：
+在后台，不需要依赖任何用户界面，不是在一个单独的进程中，依赖于创建服务时的应用程序进程。服务不会自动开启线程，所有的都默认运行在主线程中，需要在服务的内部手动创建子线程，否则会阻塞主线程。
+extends Thread，重写run（）方法，new 新类.start（）；
+implements Runnale接口，重写run（）方法，new新类实例，新建Thread（实例）.start()（Thread的构造函数）；
+notice：更新UI,必须主线程里更新。
+异步消息处理机制：子线程里传输更新（Message.obtain(),赋值，handler.sendMessage()），【注：用obtain，不用new，是因为obtain先选择在Message对象池里查找，没有才new，】主线程里handler响应，重写handleMessage（）方法。
+
+Message/Handler/MessageQueue/Looper
+Message:线程之间传递信息
+Handler：sendMessage（）发送信息，传递到handleMessage（）方法里。
+MessageQueue：存放handler发送的消息。
+Looper：不断循环，每当MQ里有消息，就取出。
+
+service需要注册
+新建service extends Service，onBind唯一抽象方法，onCreate（）创建，onStartCommand（）启动，onDestory()销毁。
+
+
+启动和停止service，Intent，startService（）；stopService（）。stopSelf().
+
+
+活动与服务之间通信：运用onBind()方法。创建新类继承Binder，里面写相关方法，创建新类实例，onBind（）方法里return实例对象。
+活动里重写ServiceConnection匿名类中的onServiceConnection（）。（p356）
+
+
+前台服务：Notification（待看）
+IntentService：在service里开启新线程，需要自己StopSelf（）；IntentService自停止，onHandleIntent（）已经在子线程以及自停止，可参考week2/MyIntentService里看，在onHandleIntent（）方法里handler.post()post类方法允许你排列一个Runnable对象到主线程队列中。
+
+碎片：support.v4.app.Fragment
+xml里：extends Fragment,override onCreateView()方法，inflate（）方法里加载布局。activity.xml里直接布局碎片。
+code里：activity.xml里FrameLayout，给FrameLayout加载碎片（），getSupportFragmentManage获取FragmentManage，beginTransaction开启事务，事务内替换碎片，事务commit。
+
 
