@@ -39,50 +39,56 @@ http://blog.csdn.net/fire_up/article/details/54135167 （关于混淆，待看)
 
 
 
-##### 6.Window
-PhoneWindow (extends Window) ,包含DecorView对象，
-DecorView是FrameLayout的子类，应用窗口的根View。
+##### 6.
+######6.1View&ViewGroup
+ViewGroup是作为父控件可以包含多个View控件，并管理其中包含的View控件。
+自定义ViewGroup的流程是onMeasure(),onLayout()（主要来摆放子View的位置，getChildCount（），getChildAt(i)，child.layout（））,一般不需要像自定义View一样重写onDraw()。
+附：着重关注https://www.cnblogs.com/qifengshi/p/5774852.html后面wrap_content&margin的例子。（？：例子中把每个childView的宽度或高度定为一致？）
+ setMeasuredDimension（）设置ViewGroup的宽高；
 
+######6.2
+Window 抽象类
+PhoneWindow (extends Window) ,包含DecorView对象，
+DecorView是FrameLayout的子类，应用窗口的根View。（Activity布局文件的父视图，一般来说是一个FrameLayout型的ViewGroup  ）
 
 
 setContentView的实现：
-1.Activity.setContentView中getWindow().setContentView
-2.PhoneWindow.setContentView():DecorView（mContentParent）的生成或者清空， mLayoutInflater.inflate(layoutResID, mContentParent).
-3. PhoneWindow.installDecor(),创建Decor对象，判断mContentParent对象是否为空，如果为空，则调用generateLayout()方法去创建mContentParent对象。
-4.  generateLayout():1.根据requestFeatures()或xml中的android：theme设置好feature值2.layoutResource（窗口修饰布局文件）根据1中设定好的feature值设定3.  View in = mLayoutInflater.inflate(layoutResource, null); 
+1.Activity.setContentView中:getWindow().setContentView()<br>
+2.PhoneWindow.setContentView():DecorView（mContentParent）的生成或者清空， mLayoutInflater.inflate(layoutResID, mContentParent).<br>
+3. PhoneWindow.installDecor(),创建Decor对象，判断mContentParent对象是否为空，如果为空，则调用generateLayout()方法去创建mContentParent对象。<br>
+
+
+######6.3 Style/Theme
+style和theme都是由<style/>节点进行定义的，但<application/>和<activity/>则为theme。
+Theme:
+系统自带&自定义（自定义要确保继承自某theme）
+1.xml里android：theme 2.在setContentView（）前setTheme（）。
+
+Android系统中定义了很多Style/Theme,在某一个属性下定义多个attr。
+
+generateLayout()方法，解析Window属性，让Activity或者Window界面承载布局文件，即DecorView直接布局子View。
+
+注意：除generateLayout()布局方法外，在onCreate（）方法里requestWindowFeature（）&getWindow（）.setFlags()之后再setContentView()加载布局。
+
+在6.2里，setContentView在前三个步骤里已经创建了DecorView对象以及对应的装载xml布局的mContentParent对象
+4.  generateLayout():1.根据requestFeatures()或xml中的android：theme设置好feature值2.layoutResource（窗口修饰布局文件）根据1中设定好的feature值设定，具体：TypeArray对象，getWindowStyle(）获取对应的属性值，3.  View in = mLayoutInflater.inflate(layoutResource, null); 
 decor.addView(in, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-ViewGroup mcontentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT); 」
+ViewGroup mcontentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT); <br>
 
 
 
-
+######6.4 LayoutInflater用来加载布局：
  LayoutInflater用来加载布局：
-1.     获取实例 LayoutInflater layoutInflater =LayoutInflater.from(context);
-2.     调用inflate方法 layoutInflater.inflate(resourceId,root)
+1. 获取实例 LayoutInflater layoutInflater =LayoutInflater.from(context);
+2. 调用inflate方法 layoutInflater.inflate(resourceId,root)
  
  
 Inflater代码例子：
 两个layout xml文件，setContentView布局外部layout，新建LayoutInflater实例，调用inflate方法加载内部layout到null生成view，将view通过addView添加到外部layout里。
  
  
-View的绘制流程（在ViewRoot的perfoemTravelsals（）方法中）：onMeasure（）；onLayout（）；onDraw（）。
-1.     view的measure（）方法：widthMeasureSpec和heightMeasureSpec两个参数。
-MeasureSpec的值由specSize和specMode。
- 
- LayoutInflater用来加载布局：
-1.     获取实例 LayoutInflater layoutInflater =LayoutInflater.from(context);
-2.     调用inflate方法 layoutInflater.inflate(resourceId,root)
- 
- 
-Inflater代码例子：
-两个layout xml文件，setContentView布局外部layout，新建LayoutInflater实例，调用inflate方法加载内部layout到null生成view，将view通过addView添加到外部layout里。
- 
- 
-View的绘制流程（在ViewRoot的perfoemTravelsals（）方法中）：onMeasure（）；onLayout（）；onDraw（）。
-1.     view的measure（）方法：widthMeasureSpec和heightMeasureSpec两个参数。
-MeasureSpec的值由specSize和specMode。
- 
-
+View的绘制流程（在ViewRoot的perfoemTravelsals（）方法中）：onMeasure（）；onLayout（）；onDraw（）。 
+http://blog.csdn.net/guolin_blog/article/details/16330267
 
 
 
