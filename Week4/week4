@@ -1,0 +1,132 @@
+#### week4
+##### 1.preference headers
+在主屏中通过 headers xml文件布局列出所有的主题设置项，而每个主题设置的详细设置则由各自指定的 PreferenceFragment 负责，而各自的 PreferenceFragment 可以如传统的 PreferenceActivity 一样布局自身的 PreferenceScreen。
+
+
+##### 2.log.d()&lod.i()
+log.d()（debug）等级高于log.i()（info 提醒），在控制台上显示的颜色不一样。
+ Log信息级别
+Log.v - VERBOSE  : 黑色
+
+Log.d - DEBUG  : 蓝色
+
+Log.i- INFO   : 绿色
+
+Log.w- WARN   : 橙色
+
+Log.e- ERROR   : 红色
+
+从上而下级别逐次增加
+grep语句：adb logcat | grep SettingsFragment 
+ 
+##### 3.android.mk 
+https://www.cnblogs.com/reality-soul/p/6893248.html
+makefile文件 上一个网址处最后事例 每一块的call my-dir 是一样的吗？以及每次都CLEAR——VARS
+
+http://blog.csdn.net/fire_up/article/details/54135167 （关于混淆，待看) 
+
+
+##### 4.bug
+1.找到activity，adb shell dumpsys activity -p com.android.settings a | less
+2.xml layout
+ 
+3.根据逻辑 跳转 更改 (须加强)
+
+4.测试 settings里mm，adb install .........Settings.apk（了解repo）
+
+
+##### 5.注意所有分支(分支了解) 待看
+
+
+
+##### 6.
+######6.1View&ViewGroup
+ViewGroup是作为父控件可以包含多个View控件，并管理其中包含的View控件。
+自定义ViewGroup的流程是onMeasure(),onLayout()（主要来摆放子View的位置，getChildCount（），getChildAt(i)，child.layout（））,一般不需要像自定义View一样重写onDraw()。
+附：着重关注https://www.cnblogs.com/qifengshi/p/5774852.html后面wrap_content&margin的例子。（？：例子中把每个childView的宽度或高度定为一致？）
+ setMeasuredDimension（）设置ViewGroup的宽高；
+
+######6.2
+Window 抽象类
+PhoneWindow (extends Window) ,包含DecorView对象，
+DecorView是FrameLayout的子类，应用窗口的根View。（Activity布局文件的父视图，一般来说是一个FrameLayout型的ViewGroup  ）
+
+
+setContentView的实现：
+1.Activity.setContentView中:getWindow().setContentView()<br>
+2.PhoneWindow.setContentView():DecorView（mContentParent）的生成或者清空， mLayoutInflater.inflate(layoutResID, mContentParent).<br>
+3. PhoneWindow.installDecor(),创建Decor对象，判断mContentParent对象是否为空，如果为空，则调用generateLayout()方法去创建mContentParent对象。<br>
+
+
+######6.3 Style/Theme
+style和theme都是由<style/>节点进行定义的，但<application/>和<activity/>则为theme。
+Theme:
+系统自带&自定义（自定义要确保继承自某theme）
+1.xml里android：theme 2.在setContentView（）前setTheme（）。
+
+Android系统中定义了很多Style/Theme,在某一个属性下定义多个attr。
+
+generateLayout()方法，解析Window属性，让Activity或者Window界面承载布局文件，即DecorView直接布局子View。
+
+注意：除generateLayout()布局方法外，在onCreate（）方法里requestWindowFeature（）&getWindow（）.setFlags()之后再setContentView()加载布局。
+
+在6.2里，setContentView在前三个步骤里已经创建了DecorView对象以及对应的装载xml布局的mContentParent对象
+4.  generateLayout():1.根据requestFeatures()或xml中的android：theme设置好feature值2.layoutResource（窗口修饰布局文件）根据1中设定好的feature值设定，具体：TypeArray对象，getWindowStyle(）获取对应的属性值，3.  View in = mLayoutInflater.inflate(layoutResource, null); 
+decor.addView(in, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+ViewGroup mcontentParent = (ViewGroup)findViewById(ID_ANDROID_CONTENT); <br>
+
+
+
+######6.4 LayoutInflater用来加载布局：
+ LayoutInflater用来加载布局：
+1. 获取实例 LayoutInflater layoutInflater =LayoutInflater.from(context);
+2. 调用inflate方法 layoutInflater.inflate(resourceId,root)
+ 
+ 
+Inflater代码例子：
+两个layout xml文件，setContentView布局外部layout，新建LayoutInflater实例，调用inflate方法加载内部layout到null生成view，将view通过addView添加到外部layout里。
+ 
+ 
+View的绘制流程（在ViewRoot的perfoemTravelsals（）方法中）：onMeasure（）；onLayout（）；onDraw（）。 
+http://blog.csdn.net/guolin_blog/article/details/16330267
+
+
+
+##### 7.Android uses-permission 权限 http://www.jb51.net/article/95979.htm
+ <permission>、 <permission-group> 、<permission-tree> 和 <uses-permission>。
+<uses-permission>最常用，当我们需要获取某个权限的时候就必须在我们的manifest文件中声明<uses-permission>。
+<permission>和 <uses-permission>的作用相似，两者之间的不同之处，<uses-permission>是android预定义的权限，<permission>是自己定义的权限。 
+<permission-group> 就是声明一个标签，该标签代表了一组permissions，而<permission-tree>是为一组permissions声明了一个namespace。
+
+
+##### 8.protected-broadcast 待看
+
+“保护性广播”，在一些AndroidManifest.xml中的一级标记<protected-broadcast>，具体有何作用：
+
+此处指定一个广播，该广播只能被系统发送。
+注 意：只有系统appliaction才能在其AndroidManifest.xml中定义Protected Broadcast，系统appliaction包括/system/framework、/system/app、vendor/app下的 package，因此设备中安装的第三方apk中如果定义了Protected Broadcast，那么这个Protected Broadcast将不生效。
+
+简单地说，Android认为有一些广播是只能由系统发送的，如果某个系统级AndroidManifest.xml中写了这个标记，那么在PKMS解析该文件时，就会把“保护性广播”标记中的名字（一般是Action字符串）记录下来。
+
+在系统运作起来之后，如果某个不具有系统权限的应用试图发送系统中的“保护性广播”，AMS会抛出异常，提示"Permission Denial: not allowed to send broadcast"。
+
+代码中可以看到<protected-broadcast>标记的具体写法，如下
+
+<protected-broadcast android:name="android.intent.action.SERVICE_STATE" />
+<protected-broadcast android:name="android.intent.action.RADIO_TECHNOLOGY" />
+
+https://www.cnblogs.com/lzlltmf/p/5906807.html 复习一下broadcast
+
+
+
+##### 9.application   http://blog.csdn.net/bigconvience/article/details/30063995
+待看
+
+##### 10.Bundle 传递数据 以key—value  
+
+待看
+
+
+
+
+
