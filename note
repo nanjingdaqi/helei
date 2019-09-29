@@ -1,0 +1,429 @@
+o,l,m,alaph代码
+
+反编译
+
+
+ADB:android debug bridge
+a.root权限：adb shell+su
+b.对包的查看：adb shell pm list packages  （？一个包就是一个类库，一个apk通常都是由一个包组成的？）
+c.adb install(可参见https://github.com/mzlogin/awesome-adb 各种安装失败输出代码)&adb uninstall
+d.adb shell dumpsys activity -h   adb shell dumpsys activity -p com.android.settings a | less
+e.adb shell am     adb shell am start com.android.settings/.ad.AdServiceSettings    
+(?调起adb shell am start com.android.settings/.ad.AdServiceSettings后显示Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.android.settings/.ad.AdServiceSettings }，后adb shell am start -a android.intent.action，显示Error: Activity not started, unable to resolve Intent { act=android.intent.action flg=0x10000000 }?)
+f.
+
+
+
+
+
+查看调用：find usages，Settings&MiuiSettings下grep R.xml.security_settings_debug_log -r src （附grep用法http://man.linuxde.net/grep）
+
+
+
+
+Bundle
+传递数据，key-value。
+可以传递基本数据类型或对象&其数组（对象必须实现Serializable或Parcelable接口）。
+各种常用类型的putXxx(String key,xxxxx)(Array,将value与key绑定)/getXxx()方法（get value by key），用于读写基本类型的数据。
+intent.putExtras(bundle);
+例子：Activity1里Intent intent=newIntent(Activity1.this,Activity2.class);intent.putExtra()里面放置键值对，若想取出Intent对象中的这些值，Activity2里getIntent().getXxxxExtra()。https://www.cnblogs.com/dchly/archive/2012/12/21/2828402.html一个简单例子，可以详看。
+
+
+Broadcast学习
+
+
+
+R.layout  R.xml   R.id
+
+
+
+userhandle.myUserId uid,user id,appid
+
+
+
+
+
+Intent intent=new Intent(当前组件.this,目标组件.class);(intent.setClass();)
+打开外部应用 intent.setClassName(包名, 包名+activity名);   intent.setComponent(new ComponentName("com.android.deskclock","com.android.deskclock.DeskClock"));
+
+PM PackageManage （管理应用程序包）
+ 
+
+
+1.代码
+meld.
+gitk .(查看分支)
+rm 删除
+git reset --soft HEAD~1
+git status 
+ git log -p  
+git add -A 
+ git commit --amend      
+
+
+
+
+
+
+cherry-pick
+1.git stash   (储存)现在你想切换分支，但是你还不想提交你正在进行中的工作；所以你储藏这些变更。为了往堆栈推送一个新的储藏，
+git stash list 查看现有的储藏
+git stash apply stash@{2}
+2.git checkout -b del_cus_m miui/v8-m-alpha
+3.cherry-pick code
+4.git status
+git diff
+git remote update
+git branch -a 
+命令可以查看所有本地分支和远程分支（git branch -r 可以只查看远程分支） 
+git diff
+git status
+git add -A
+git cherry-pick --continue
+git log -p
+repo upload --cbr --no-verify .
+
+
+
+
+
+
+
+
+
+如果要再修改代码，直接切到那个分支，更改，add，commit，repo
+
+git commit --amend -s
+repo upload --cbr --no-verify .
+git add . ：他会监控工作区的状态树，使用它会把工作时的所有变化提交到暂存区，包括文件内容修改(modified)以及新文件(new)，但不包括被删除的文件。
+
+git add -u ：他仅监控已经被add的文件（即tracked file），他会将被修改的文件提交到暂存区。add -u 不会提交新文件（untracked file）。（git add --update的缩写）
+
+git add -A ：是上面两个功能的合集（git add --all的缩写）
+
+
+
+
+uget安装指南 https://jingyan.baidu.com/article/bea41d43bd06f7b4c51be609.html
+
+
+
+?1.本地分支太多，怎么删除？（明白一点，本地的提了gerrit的change是从网上down不下来的，修改切远程分支没有gerrit上修改内容，所以一定要有本地分支保存加以修改，名字一定要好好起）
+？2.一个远程分支对应多个本地分支
+
+
+
+git remote upload 
+git branch
+git rebase
+
+
+
+http://blog.csdn.net/wh_19910525/article/details/7468549 log 相关
+http://blog.csdn.net/zona_wzq/article/details/51451440 rm相关
+git add -A  提交所有变化
+
+·  git add -u  提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)
+
+·  git add .  提交新文件(new)和被修改(modified)文件，不包括被删除(deleted)文件
+
+
+  
+看平台：miuisettings下  cd ~/Android/Sdk/tools/bin  ./uiautomatorviewer
+
+
+adb shell pm path com.miui.voiceassist
+通过包名查找app位置 adb shell pm path [packagename] 
+
+
+
+查看所有包名：adb shell 
+su
+cd data/data
+ls
+
+
+
+
+往前切了三个分支
+
+
+
+
+
+
+gedit ~/.gitconfig
+
+分支 一个.git文件分支在一起
+
+
+
+
+
+
+
+
+
+
+commit 
+
+
+
+
+
+
+
+
+
+lsusb
+
+
+
+
+
+rom安装
+tar -vxz -f 文件名     http://www.vixual.net/blog/archives/127
+adb reboot fastboot        adb reboot bootloader
+进入到解压缩的文件里./flash_all.sh  
+
+vim搜索 ：最快的方式是让光标停留在想要查找的单词的任意一个字母上面， 然后输入Shift + *  ，即可快速选中该单词，并且可以通过 n  或  N 进行上一个或下一个的匹配。
+
+adb logcat | grep TAG 
+
+
+adb logcat >1.txt
+gedit 1.txt
+ActivityManager
+
+
+changes to commit
+changes not staged for commit
+untrackedfiles (stash 不顶用，存在的时候不能新建和切换分支)
+切换分支：git checkout 分支名
+git reset --hard 分支号
+git reset --hard HEAD~1
+git reset --soft HEAD~1
+git reset HEAD~1
+
+其实就是--soft 、--mixed以及--hard是三个恢复等级。使用--soft就仅仅将头指针恢复，已经add的缓存以及工作空间的所有东西都不变。如果使用--mixed，就将头恢复掉，已经add的缓存也会丢失掉，工作空间的代码什么的是不变的。如果使用--hard，那么一切就全都恢复了，头变，aad的缓存消失，代码什么的也恢复到以前状态。
+
+
+解决冲突并运行 “git cherry-pick –continue”） （使用 “git 
+cherry-pick –abort” 以取消拣选操作）
+git add -i(选择)/git add 文件名
+d看路径，数字转到对应路径
+
+lsusb
+重新挂载文件系统 adb remount 在安装前（MODE???)
+sudo gedit /etc/udev/rules.d/51-android.rules?????
+cat gedit /etc/udev/rules.d/51-android.rules?????
+vim
+
+
+adb shell am start 包名+/+文件名（全）
+报错信息：Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.android.settings/.HttpInvokeAppSettings }
+java.lang.SecurityException: Permission Denial: starting Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 cmp=com.android.settings/.HttpInvokeAppSettings } from null (pid=989, uid=2000) not exported from uid 1000
+https://stackoverflow.com/questions/30001259/permission-denial-starting-intent-from-null-pid-30992-uid-2000-not-exported（可能是activity没有写在manifest里或者写了但是没有intent）
+
+
+
+
+
+
+Activity和fragment里用R.layout
+preference里用R.xml
+其他xml还可用于注册资源
+
+
+ArrayList是实现了基于动态数组的数据结构，LinkedList基于链表的数据结构。 
+
+
+单例模式
+构造函数私有化，客户端代码不能通过new的形式手动构造单例类的对象；有一个公有静态方法，调用这个方法获取到单例类的唯一对象。
+
+
+
+
+fragment 一种控制器对象，activity可委派它完成一些任务通常这些任务就是管理用户界面，fragment放在activity里，fragment本身不具有在屏幕上显示视图的能力，只有放置在activity里，才能显示出来。
+layout .xml文件，新建class exteds Fragment,class里onCreateView()；
+
+    public View inflate(@LayoutRes int resource, @Nullable ViewGroup root, boolean attachToRoot) {
+        final Resources res = getContext().getResources();
+
+        // MIUI ADD:
+        resource = LayoutInflaterMap.getResourceId(getContext(), resource);
+
+        if (DEBUG) {
+            Log.d(TAG, "INFLATING from resource: \"" + res.getResourceName(resource) + "\" ("
+                    + Integer.toHexString(resource) + ")");
+        }
+
+        final XmlResourceParser parser = res.getLayout(resource);
+        try {
+            return inflate(parser, root, attachToRoot);
+        } finally {
+            parser.close();
+        }
+    }
+
+
+
+http://blog.csdn.net/myth13141314/article/details/62045162
+MainActivity.this:表示mainacivity对象，一般用在内部类中指示外面的this
+                  若在内部类中直接用this，指示的是内部类本身。
+                  mainactivity extends activity extends context，
+this：表示当前对象，在那个类调用，就指向该对象。
+getContext()：View类中提供的方法，返回的是当前View运行在哪个Activity Context中，
+getActivity（）：获得Fragment依附的activity对象。
+Fragment里边的getActivity()不推荐使用原因如下：这个方法会返回当前Fragment所附加的Activity，当Fragment生命周期结束并销毁时，getActivity()返回的是null，所以在使用时要注意判断null或者捕获空指针异常。
+
+
+
+https://www.jianshu.com/p/94e0f9ab3f1d context
+ Android应用模型是基于组件的应用设计模式，组件的运行要有一个完整的Android工程环境，在这个环境下，Activity、Service等系统组件才能够正常工作，而这些组件并不能采用普通的Java对象创建方式，new一下就能创建实例了，而是要有它们各自的上下文环境，也就是我们这里讨论的Context。可以这样讲，Context是维持Android程序中各组件能够正常工作的一个核心功能类。
+一个应用程序可以认为是一个工作环境，用户在这个环境中会切换到不同的场景，
+
+
+https://www.cnblogs.com/XACOOL/p/5292141.html    getResource（）
+
+
+native 修饰原生态方法（JNI接口）
+https://www.cnblogs.com/youngnong/p/5792108.htmlz
+http://blog.csdn.net/lingjunqi/article/details/50032109
+https://www.cnblogs.com/b3051/p/7484501.html
+https://www.cnblogs.com/a284628487/p/4318698.html
+
+
+
+fragment也有oncreate方法？
+
+
+android：order
+http://blog.csdn.net/sk719887916/article/details/42437253
+https://www.2cto.com/kf/201509/442037.html
+
+android：persistent
+https://my.oschina.net/youranhongcha/blog/269591
+
+
+https://developer.android.com/reference/android/preference/ListPreference.html#attr_android:entries    安卓官网
+
+
+
+repo sync(更新本地分支)
+git remote upload（更新所在的目录下所有分支）
+
+export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx8000m";out/host/linux-x86/bin/jack-admin kill-server;out/host/linux-x86/bin/jack-admin start-server;
+
+
+
+02.23
+log.d(TAG,"",e); System.currentTimesMillis();
+
+
+
+context
+
+
+强删
+
+adb shell pm path com.miui.voiceassist
+
+adb uninstall com.miui.voiceassist    
+~Failure [DELETE_FAILED_INTERNAL_ERROR]
+
+adb disable-verity                
+~Verity disabled on /vendor
+~Verity disabled on /system
+
+adb reboot  
+adb root 
+
+ adb remount
+
+ adb shell 
+cd system/app
+rm -rf VoiceAssist/  exit
+reboot
+
+
+git pull    文件名    . 复制一遍到本地
+
+
+
+
+https://zhidao.baidu.com/question/389750287.html
+padding &layout_margin
+
+
+
+
+
+chmod +x 
+
+adb root
+adb shell
+cd /data/data
+cd com.android.settings
+
+
+cd ~/
+mv 现有文件名 想更改文件名
+adb push 文件名  /system/app/
+adb reboot
+adb shell pm path com.miui.voiceassist
+adb root
+adb shell
+ cd /data/user_de/0/com.android.settings/ files/index.json
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http://blog.csdn.net/kebi007/article/details/53576380  style和theme定义都在style里，可以继承，区别在于应用范围。
+http://blog.csdn.net/lmj623565791/article/details/45022631 
+https://www.cnblogs.com/rayray/p/3442026.html
+?/attr
+
+http://blog.csdn.net/wenwen091100304/article/details/49667293  selector
+http://blog.csdn.net/g984160547/article/details/70257839 shape https://www.oschina.net/question/166763_34833
+http://blog.csdn.net/u014695188/article/details/52815444 layer-list
+
+
+
+git clone git@github.com:xxxx/xxx.git
+git add -A
+
+git remote rm origin
+git remote add origin git@github.com:
+git commit -s ""
+git push -u origin master
